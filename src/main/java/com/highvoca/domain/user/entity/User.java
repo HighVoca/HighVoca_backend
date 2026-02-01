@@ -46,7 +46,6 @@ public class User extends BaseTimeEntity {
     @ColumnDefault("25")
     private Integer dailyGoal;
 
-    // --- 설정 (Settings) ---
     @ColumnDefault("true")
     private Boolean isProgressVisible;
 
@@ -68,4 +67,8 @@ public class User extends BaseTimeEntity {
         this.provider = provider;
         this.role = role;
     }
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }
