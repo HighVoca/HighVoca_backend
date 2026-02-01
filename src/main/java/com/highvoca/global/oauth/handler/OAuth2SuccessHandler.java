@@ -26,8 +26,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    @Value("${app.base-url:http://localhost:8080}")
-    private String baseUrl;
+    @Value("${app.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
 
     @Override
     @Transactional
@@ -48,9 +48,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User Not Found"));
         user.updateRefreshToken(refreshToken);
 
-        log.info("✅ 로그인 성공! Access Token 발급 완료");
+        log.info("✅ 로그인 성공! 토큰을 프론트엔드로 전달합니다.");
 
-        String targetUrl = UriComponentsBuilder.fromUriString(baseUrl + "/login-success")
+        String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl + "/oauth/callback")
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build().toUriString();
