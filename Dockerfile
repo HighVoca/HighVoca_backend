@@ -1,5 +1,5 @@
 
-FROM openjdk:17-jdk
+FROM openjdk:21-jdk
 
 ARG JAR_FILE=build/libs/*.jar
 
