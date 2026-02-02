@@ -25,6 +25,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
+    // .env에서 값 가져오기
     @Value("${KAKAO_CLIENT_ID}")
     private String kakaoClientId;
 
@@ -37,11 +38,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.ico").permitAll()
+                        // Swagger 주소 등 허용
+                        .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.ico", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/login/**", "/api/v1/auth/**", "/oauth2/**", "/login-success").permitAll()
                         .anyRequest().permitAll()
                 )
@@ -60,10 +60,11 @@ public class SecurityConfig {
                 ClientRegistration.withRegistrationId("kakao")
                         .clientId(kakaoClientId)
                         .clientSecret(kakaoClientSecret)
-
                         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
                         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+
                         .redirectUri("{baseUrl}/login/oauth2/code/kakao")
+
                         .scope("profile_nickname", "account_email")
                         .authorizationUri("https://kauth.kakao.com/oauth/authorize")
                         .tokenUri("https://kauth.kakao.com/oauth/token")

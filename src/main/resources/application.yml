@@ -17,6 +17,8 @@ spring:
         show_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+server:
+  forward-headers-strategy: native
 
 jwt:
   secret: ${JWT_SECRET}
