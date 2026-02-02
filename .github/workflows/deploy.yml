@@ -59,5 +59,10 @@ jobs:
             # 새 이미지 받아오기
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/highvoca-server:latest
 
-            # 새 컨테이너 실행 (8080포트 연결)
-            sudo docker run -d --name server -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/highvoca-server:latest
+            sudo docker run -d --name server -p 8080:8080 \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+              -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
+              -e TZ=Asia/Seoul \
+              ${{ secrets.DOCKER_USERNAME }}/highvoca-server:latest

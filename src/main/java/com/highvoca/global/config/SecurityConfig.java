@@ -63,7 +63,7 @@ public class SecurityConfig {
 
                         .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
                         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                        .redirectUri("http://localhost:8080/login/oauth2/code/kakao")
+                        .redirectUri("{baseUrl}/login/oauth2/code/kakao")
                         .scope("profile_nickname", "account_email")
                         .authorizationUri("https://kauth.kakao.com/oauth/authorize")
                         .tokenUri("https://kauth.kakao.com/oauth/token")
