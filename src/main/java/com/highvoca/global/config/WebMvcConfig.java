@@ -12,8 +12,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**") // 모든 경로에 대해
                 .allowedOrigins(
                         "http://localhost:3000",
-                        "http://13.125.xxx.xxx:3000", // 프론트엔드가 사용할 배포 IP
-                        "http://43.202.223.187" // 아까 받은 탄력적 IP
+                        "http://13.125.xxx.xxx:3000",
+                        "https://highvoca.cloud",
+                        "https://www.highvoca.cloud",
+                        "http://3.36.205.51:8080"
                 )
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
