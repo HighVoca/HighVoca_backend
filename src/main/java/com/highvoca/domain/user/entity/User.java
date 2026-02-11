@@ -81,4 +81,8 @@ public class User {
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    public void updateLevel(Double level) {
+        this.level = level;
+    }
 }
