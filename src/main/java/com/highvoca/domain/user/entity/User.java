@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@EntityListeners(AuditingEntityListener.class) // created_at, updated_at 자동 관리
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "User")
 public class User {
 
@@ -30,10 +32,12 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Builder.Default
     @Column(name = "streak_cnt")
-    private Integer streakCnt;
+    private Integer streakCnt = 0;
 
-    private Double level;
+    @Builder.Default
+    private Double level = 1.0;
 
     @Enumerated(EnumType.STRING)
     private SocialProvider provider;
@@ -47,20 +51,25 @@ public class User {
     @Column(name = "last_study_date")
     private LocalDateTime lastStudyDate;
 
+    @Builder.Default
     @Column(name = "daily_goal")
-    private Integer dailyGoal;
+    private Integer dailyGoal = 25;
 
+    @Builder.Default
     @Column(name = "is_progress_visible")
-    private Boolean isProgressVisible;
+    private Boolean isProgressVisible = true;
 
+    @Builder.Default
     @Column(name = "is_notification_enabled")
-    private Boolean isNotificationEnabled;
+    private Boolean isNotificationEnabled = false;
 
+    @Builder.Default
     @Column(name = "is_level_visible")
-    private Boolean isLevelVisible;
+    private Boolean isLevelVisible = true;
 
+    @Builder.Default
     @Column(length = 10)
-    private String language;
+    private String language = "KO";
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
@@ -69,14 +78,6 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Builder
-    public User(String username, String email, SocialProvider provider, Role role) {
-        this.username = username;
-        this.email = email;
-        this.provider = provider;
-        this.role = role;
-    }
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
