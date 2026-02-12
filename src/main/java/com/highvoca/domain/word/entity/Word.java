@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Word")
+@Table(name = "word")
 public class Word {
 
     @Id
@@ -24,6 +24,9 @@ public class Word {
 
     @Column(length = 100)
     private String pronunciation;
+
+    @Column(name = "part_of_speech", length = 50)
+    private String partOfSpeech;
 
     @Column(name = "audio_url", length = 500)
     private String audioUrl;

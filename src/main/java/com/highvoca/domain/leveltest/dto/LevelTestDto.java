@@ -13,16 +13,19 @@ public class LevelTestDto {
     // ===== Enums =====
 
     public enum Difficulty {
-        BEGINNER(1),
-        INTERMEDIATE(6),
-        ADVANCED(11),
-        EXPERT(16);
+        BEGINNER(1, 5),
+        INTERMEDIATE(6, 10),
+        ADVANCED(11, 15),
+        EXPERT(16, 20);
 
         @Getter
         private final int startLevel;
+        @Getter
+        private final int endLevel;
 
-        Difficulty(int startLevel) {
+        Difficulty(int startLevel, int endLevel) {
             this.startLevel = startLevel;
+            this.endLevel = endLevel;
         }
     }
 
@@ -75,6 +78,7 @@ public class LevelTestDto {
         private String meaning;
         private Integer level;
         private String pronunciation;
+        private String partOfSpeech;
 
         public static WordDto from(Word word) {
             return WordDto.builder()
@@ -83,6 +87,7 @@ public class LevelTestDto {
                     .meaning(word.getMeaning())
                     .level(word.getLevel())
                     .pronunciation(word.getPronunciation())
+                    .partOfSpeech(word.getPartOfSpeech())
                     .build();
         }
     }
