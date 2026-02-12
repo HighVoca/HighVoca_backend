@@ -31,7 +31,7 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("HighVoca API 명세서")
-                .description("하이보카(HighVoca) 서비스의 API 문서입니다. 우측 상단 'Authorize' 버튼을 눌러 토큰을 입력하고 테스트하세요.")
+                .description("하이보카(HighVoca) 서비스의 API 문서입니다.")
                 .version("1.0.0");
     }
 }

@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_word_progress")
 public class UserWordProgress {
@@ -31,4 +33,14 @@ public class UserWordProgress {
 
     @Column(name = "last_reviewed_at")
     private LocalDateTime lastReviewedAt;
+
+    public void incrementStage() {
+        this.currentStage++;
+        this.lastReviewedAt = LocalDateTime.now();
+    }
+
+    public void resetStage() {
+        this.currentStage = 0;
+        this.lastReviewedAt = LocalDateTime.now();
+    }
 }

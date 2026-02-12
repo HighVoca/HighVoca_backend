@@ -2,6 +2,12 @@ package com.highvoca.domain.leveltest.service;
 
 import com.highvoca.domain.leveltest.dto.LevelTestDto;
 import com.highvoca.domain.leveltest.dto.LevelTestDto.*;
+import com.highvoca.domain.study.entity.StudySession;
+import com.highvoca.domain.study.entity.UserWordProgress;
+import com.highvoca.domain.study.entity.WrongWordHistory;
+import com.highvoca.domain.study.repository.StudySessionRepository;
+import com.highvoca.domain.study.repository.UserWordProgressRepository;
+import com.highvoca.domain.study.repository.WrongWordHistoryRepository;
 import com.highvoca.domain.user.entity.User;
 import com.highvoca.domain.user.repository.UserRepository;
 import com.highvoca.domain.word.entity.Word;
@@ -12,8 +18,11 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,6 +32,9 @@ public class LevelTestService {
 
     private final WordRepository wordRepository;
     private final UserRepository userRepository;
+    private final StudySessionRepository studySessionRepository;
+    private final UserWordProgressRepository userWordProgressRepository;
+    private final WrongWordHistoryRepository wrongWordHistoryRepository;
     private final ChatClient.Builder chatClientBuilder;
 
     private static final int QUESTIONS_PER_STEP = 5;
@@ -33,8 +45,9 @@ public class LevelTestService {
      * Step 1: 초기 난이도 기반 단어 조회
      */
     public StepResponse getStep1Words(Step1Request request) {
-        int level = request.getDifficulty().getStartLevel();
-        List<Word> words = wordRepository.findRandomWordsByLevel(level, QUESTIONS_PER_STEP);
+        int minLevel = request.getDifficulty().getStartLevel();
+        int maxLevel = request.getDifficulty().getEndLevel();
+        List<Word> words = wordRepository.findRandomWordsByLevelRange(minLevel, maxLevel, QUESTIONS_PER_STEP);
 
         return StepResponse.builder()
                 .words(words.stream().map(WordDto::from).toList())
@@ -73,7 +86,10 @@ public class LevelTestService {
         // 다음 레벨 결정
         int nextLevel = calculateNextLevel(currentLevel, correctCount);
 
-        List<Word> words = wordRepository.findRandomWordsByLevel(nextLevel, QUESTIONS_PER_STEP);
+        // targetLevel 기준 ±2 범위에서 랜덤 단어 조회
+        int minLevel = Math.max(MIN_LEVEL, nextLevel - 2);
+        int maxLevel = Math.min(MAX_LEVEL, nextLevel + 2);
+        List<Word> words = wordRepository.findRandomWordsByLevelRange(minLevel, maxLevel, QUESTIONS_PER_STEP);
 
         return StepResponse.builder()
                 .words(words.stream().map(WordDto::from).toList())
@@ -81,7 +97,7 @@ public class LevelTestService {
     }
 
     /**
-     * 최종 제출: 점수 계산 + 사용자 레벨 업데이트 + AI 피드백
+     * 최종 제출: 점수 계산 + DB 저장 + 사용자 레벨 업데이트 + AI 피드백
      */
     @Transactional
     public SubmitResponse submitAndAnalyze(Long userId, SubmitRequest request) {
@@ -126,10 +142,66 @@ public class LevelTestService {
         // levelName 결정
         String levelName = determineLevelName(finalLevel);
 
-        // 사용자 레벨 업데이트
+        // 1. 사용자 레벨 업데이트
         user.updateLevel(finalLevel);
 
-        // AI 피드백 생성
+        // 2. StudySession 저장
+        int correctCount = (int) totalResult.stream()
+                .filter(QuestionResult::getIsCorrect)
+                .count();
+
+        StudySession session = StudySession.builder()
+                .user(user)
+                .totalCount(totalResult.size())
+                .score(correctCount)
+                .accuracy((double) correctCount / totalResult.size() * 100)
+                .build();
+        studySessionRepository.save(session);
+
+        // 3. UserWordProgress & WrongWordHistory 저장
+        LocalDate today = LocalDate.now();
+
+        for (QuestionResult result : totalResult) {
+            Word word = wordMap.get(result.getWordId());
+            if (word == null) continue;
+
+            Optional<UserWordProgress> progressOpt =
+                    userWordProgressRepository.findByUserIdAndWordId(userId, word.getId());
+
+            if (result.getIsCorrect()) {
+                if (progressOpt.isPresent()) {
+                    progressOpt.get().incrementStage();
+                } else {
+                    userWordProgressRepository.save(UserWordProgress.builder()
+                            .user(user)
+                            .word(word)
+                            .currentStage(1)
+                            .lastReviewedAt(LocalDateTime.now())
+                            .build());
+                }
+            } else {
+                // 오답 기록 저장
+                wrongWordHistoryRepository.save(WrongWordHistory.builder()
+                        .user(user)
+                        .word(word)
+                        .wrongDate(today)
+                        .build());
+
+                // UserWordProgress 리셋 또는 생성
+                if (progressOpt.isPresent()) {
+                    progressOpt.get().resetStage();
+                } else {
+                    userWordProgressRepository.save(UserWordProgress.builder()
+                            .user(user)
+                            .word(word)
+                            .currentStage(0)
+                            .lastReviewedAt(LocalDateTime.now())
+                            .build());
+                }
+            }
+        }
+
+        // 4. AI 피드백 생성
         String aiAnalysis = generateAiFeedback(totalResult, wordMap);
 
         return SubmitResponse.builder()
