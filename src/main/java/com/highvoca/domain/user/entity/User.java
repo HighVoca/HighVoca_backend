@@ -86,4 +86,8 @@ public class User {
     public void updateLevel(Double level) {
         this.level = level;
     }
+
+    public void updateDailyGoal(Integer dailyGoal) {
+        this.dailyGoal = dailyGoal;
+    }
 }
