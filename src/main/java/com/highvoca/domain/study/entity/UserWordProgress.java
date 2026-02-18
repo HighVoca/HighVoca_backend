@@ -34,13 +34,26 @@ public class UserWordProgress {
     @Column(name = "last_reviewed_at")
     private LocalDateTime lastReviewedAt;
 
+    @Column(name = "next_review_at")
+    private LocalDateTime nextReviewAt;
+
     public void incrementStage() {
         this.currentStage++;
         this.lastReviewedAt = LocalDateTime.now();
+        this.nextReviewAt = calculateNextReview(this.currentStage);
     }
 
     public void resetStage() {
         this.currentStage = 0;
         this.lastReviewedAt = LocalDateTime.now();
+        this.nextReviewAt = LocalDateTime.now();
+    }
+
+    private LocalDateTime calculateNextReview(int stage) {
+        // SRS intervals: 1h, 1d, 3d, 7d, 14d, 30d, 60d
+        long[] hoursInterval = {1, 24, 72, 168, 336, 720, 1440};
+        int index = Math.min(stage - 1, hoursInterval.length - 1);
+        long hours = hoursInterval[Math.max(index, 0)];
+        return LocalDateTime.now().plusHours(hours);
     }
 }
