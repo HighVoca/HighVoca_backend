@@ -37,6 +37,16 @@ public class WordStudyController {
         return ResponseEntity.ok(ApiResponse.success("오늘의 학습 단어 조회 성공", response));
     }
 
+    @Operation(summary = "추가 학습 단어 조회")
+    @GetMapping("/extra")
+    public ResponseEntity<ApiResponse<List<WordStudyResponse>>> getExtraWords(
+            HttpServletRequest httpRequest,
+            @RequestParam(defaultValue = "20") int count) {
+        Long userId = extractUserId(httpRequest);
+        List<WordStudyResponse> response = wordStudyService.getExtraWords(userId, count);
+        return ResponseEntity.ok(ApiResponse.success("추가 학습 단어 조회 성공", response));
+    }
+
     @Operation(summary = "답안 제출 및 AI 채점")
     @PostMapping("/check")
     public ResponseEntity<ApiResponse<CheckAnswerResponse>> checkAnswer(@RequestBody CheckAnswerRequest request) {

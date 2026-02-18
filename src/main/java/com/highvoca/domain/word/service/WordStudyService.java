@@ -55,4 +55,32 @@ public class WordStudyService {
 
         return result;
     }
+
+    @Transactional(readOnly = true)
+    public List<WordStudyResponse> getExtraWords(Long userId, int count) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        int userLevel = (int) Math.round(user.getLevel());
+        int minLevel = Math.max(1, userLevel - 2);
+        int maxLevel = Math.min(20, userLevel + 2);
+
+        // Priority: unstudied words within level range
+        List<Word> words = new ArrayList<>(wordRepository.findNewWordsForUser(userId, minLevel, maxLevel, count));
+
+        // Fallback: fill remaining with any random words
+        if (words.size() < count) {
+            int remaining = count - words.size();
+            List<Long> excludeIds = words.stream().map(Word::getId).toList();
+            if (excludeIds.isEmpty()) {
+                excludeIds = List.of(0L);
+            }
+            List<Word> fallbackWords = wordRepository.findRandomWordsExcluding(excludeIds, remaining);
+            words.addAll(fallbackWords);
+        }
+
+        return words.stream()
+                .map(word -> WordStudyResponse.from(word, false))
+                .toList();
+    }
 }

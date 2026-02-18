@@ -20,4 +20,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
                    "ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<Word> findNewWordsForUser(@Param("userId") Long userId, @Param("minLevel") int minLevel,
                                    @Param("maxLevel") int maxLevel, @Param("limit") int limit);
+
+    @Query(value = "SELECT * FROM word w WHERE w.word_id NOT IN (:excludeIds) ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<Word> findRandomWordsExcluding(@Param("excludeIds") List<Long> excludeIds, @Param("limit") int limit);
 }
