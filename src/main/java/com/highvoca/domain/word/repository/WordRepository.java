@@ -14,4 +14,10 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     @Query(value = "SELECT * FROM word WHERE level BETWEEN :minLevel AND :maxLevel ORDER BY RAND() LIMIT :limit", nativeQuery = true)
     List<Word> findRandomWordsByLevelRange(@Param("minLevel") int minLevel, @Param("maxLevel") int maxLevel, @Param("limit") int limit);
+
+    @Query(value = "SELECT * FROM word w WHERE w.level BETWEEN :minLevel AND :maxLevel " +
+                   "AND w.word_id NOT IN (SELECT uwp.word_id FROM user_word_progress uwp WHERE uwp.user_id = :userId) " +
+                   "ORDER BY RAND() LIMIT :limit", nativeQuery = true)
+    List<Word> findNewWordsForUser(@Param("userId") Long userId, @Param("minLevel") int minLevel,
+                                   @Param("maxLevel") int maxLevel, @Param("limit") int limit);
 }
