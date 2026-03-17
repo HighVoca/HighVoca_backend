@@ -58,6 +58,7 @@ jobs:
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
               -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
               -e APP_FRONTEND_URL=${{ secrets.APP_FRONTEND_URL }} \
               -e TZ=Asia/Seoul \
               ${{ secrets.DOCKER_USERNAME }}/highvoca-server:latest

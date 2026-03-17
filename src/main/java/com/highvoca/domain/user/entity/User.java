@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -85,5 +86,26 @@ public class User {
 
     public void updateLevel(Double level) {
         this.level = level;
+    }
+
+    public void updateDailyGoal(Integer dailyGoal) {
+        this.dailyGoal = dailyGoal;
+    }
+
+    public void updateStreak() {
+        LocalDate today = LocalDate.now();
+        if (this.lastStudyDate == null) {
+            this.streakCnt = 1;
+        } else {
+            LocalDate lastDate = this.lastStudyDate.toLocalDate();
+            if (lastDate.equals(today)) {
+                return;
+            } else if (lastDate.equals(today.minusDays(1))) {
+                this.streakCnt++;
+            } else {
+                this.streakCnt = 1;
+            }
+        }
+        this.lastStudyDate = LocalDateTime.now();
     }
 }
