@@ -11,7 +11,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 경로에 대해
                 .allowedOrigins(
-                        "http://localhost:3000",
+                        "http://localhost:5173",
                         "http://13.125.xxx.xxx:3000",
                         "https://highvoca.cloud",
                         "https://www.highvoca.cloud",

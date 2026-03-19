@@ -6,7 +6,15 @@ import lombok.NoArgsConstructor;
 
 public class AuthDto {
 
-    // 토큰 재발급 요청 (프론트가 보낼 데이터)
+    // 일회용 코드 교환 요청
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CodeExchangeRequest {
+        private String code;
+    }
+
+    // 토큰 재발급 요청
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -14,7 +22,7 @@ public class AuthDto {
         private String refreshToken;
     }
 
-    // 토큰 응답 (서버가 줄 데이터)
+    // 토큰 응답 (공통)
     @Getter
     @AllArgsConstructor
     public static class TokenResponse {

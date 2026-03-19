@@ -17,8 +17,18 @@ public class AuthController {
 
     private final AuthService authService;
 
+    // 일회용 코드 → 토큰 교환
+    @PostMapping("/code")
+    public ResponseEntity<ApiResponse<AuthDto.TokenResponse>> exchangeCode(
+            @RequestBody AuthDto.CodeExchangeRequest request) {
+        AuthDto.TokenResponse tokens = authService.exchangeCode(request);
+        return ResponseEntity.ok(ApiResponse.success("로그인 성공", tokens));
+    }
+
+    // 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<AuthDto.TokenResponse>> reissue(@RequestBody AuthDto.ReissueRequest request) {
+    public ResponseEntity<ApiResponse<AuthDto.TokenResponse>> reissue(
+            @RequestBody AuthDto.ReissueRequest request) {
         AuthDto.TokenResponse tokens = authService.reissue(request);
         return ResponseEntity.ok(ApiResponse.success("토큰 재발급 성공", tokens));
     }
