@@ -15,7 +15,11 @@ public interface UserWordProgressRepository extends JpaRepository<UserWordProgre
     int countByUserIdAndLastReviewedAtBetween(Long userId, LocalDateTime start, LocalDateTime end);
 
     @Query("SELECT uwp FROM UserWordProgress uwp JOIN FETCH uwp.word " +
-           "WHERE uwp.user.id = :userId AND uwp.nextReviewAt <= :now " +
-           "ORDER BY uwp.nextReviewAt ASC")
+            "WHERE uwp.user.id = :userId AND uwp.nextReviewAt <= :now " +
+            "ORDER BY uwp.nextReviewAt ASC")
     List<UserWordProgress> findReviewableWords(@Param("userId") Long userId, @Param("now") LocalDateTime now);
+
+    List<UserWordProgress> findByUserIdAndLastReviewedAtBetween(Long userId, LocalDateTime start, LocalDateTime end);
+
+    int countByUserId(Long userId);
 }

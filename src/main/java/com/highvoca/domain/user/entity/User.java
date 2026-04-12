@@ -108,4 +108,12 @@ public class User {
         }
         this.lastStudyDate = LocalDateTime.now();
     }
+
+    public void updateProgressVisible(Boolean isProgressVisible) {
+        this.isProgressVisible = isProgressVisible;
+    }
+
+    public void updateLevelVisible(Boolean isLevelVisible) {
+        this.isLevelVisible = isLevelVisible;
+    }
 }
