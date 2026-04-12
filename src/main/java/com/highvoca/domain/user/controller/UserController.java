@@ -5,6 +5,8 @@ import com.highvoca.domain.user.entity.User;
 import com.highvoca.domain.user.repository.UserRepository;
 import com.highvoca.domain.user.service.UserService;
 import com.highvoca.global.jwt.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "User API", description = "유저 마이페이지 및 설정 API")
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -21,9 +24,8 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    // 1. 마이페이지 (내 정보 및 통계) 조회
-    // 명세서의 /api/v1/users/ 와 프론트엔드 관례인 /me 를 모두 지원하도록 맵핑
-    @GetMapping({"", "/", "/me"})
+    @Operation(summary = "마이페이지 조회", description = "내 정보와 학습 통계(총 학습 단어, 평균 정답률 등)를 조회합니다.")
+    @GetMapping("/me")
     public ResponseEntity<?> getMyPage(HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
         UserDto.MyPageResponse result = userService.getMyPageInfo(userId);
@@ -36,7 +38,7 @@ public class UserController {
         ));
     }
 
-    // 2. 진행도 표시 설정 변경
+    @Operation(summary = "진행도 표시 설정 변경", description = "학습 중 진행도 표시 여부(true/false)를 변경합니다.")
     @PatchMapping("/settings/progress")
     public ResponseEntity<?> updateProgressSetting(
             HttpServletRequest request,
@@ -52,7 +54,7 @@ public class UserController {
         ));
     }
 
-    // 3. 단어 레벨 표시 설정 변경
+    @Operation(summary = "단어 레벨 표시 설정 변경", description = "단어 레벨 표시 여부(true/false)를 변경합니다.")
     @PatchMapping("/settings/level")
     public ResponseEntity<?> updateLevelSetting(
             HttpServletRequest request,
@@ -68,7 +70,6 @@ public class UserController {
         ));
     }
 
-    // 💡 공통 유저 ID 추출 헬퍼 메서드
     private Long getUserIdFromRequest(HttpServletRequest request) {
         String token = jwtTokenProvider.resolveToken(request);
         if (token == null) {
